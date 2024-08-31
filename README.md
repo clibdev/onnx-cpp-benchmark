@@ -1,59 +1,40 @@
-# onnx-cpp-benchmark
+# Fork of [ami-iit/onnx-cpp-benchmark](https://github.com/ami-iit/onnx-cpp-benchmark)
 
-Simple tool to profile onnx inference with C++ APIs.
+Differences between original repository and fork:
 
-## Installation
+* ONNX Runtime installation with [setup.sh](setup.sh) file.
+* CLI11 dependency removed.
 
-### With conda-forge dependencies
-
-#### Linux/macOS
-
-~~~
-mamba create -n onnxcppbenchmark compilers cli11 onnxruntime=*=*cuda cmake ninja pkg-config cudnn cudatoolkit onnxruntime-cpp=*=*cuda
-mamba activate onnxcppbenchmark
-git clone https://github.com/ami-iit/onnx-cpp-benchmark
-cd onnx-cpp-benchmark
-mkdir build
-cd build
-cmake -GNinja -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX ..
-ninja
-~~~
-
-#### Windows
-
-~~~
-mamba create -n onnxcppbenchmark compilers cli11 onnxruntime=*=*cuda cmake ninja pkg-config cudnn cudatoolkit onnxruntime-cpp=*=*cuda
-mamba activate onnxcppbenchmark
-git clone https://github.com/ami-iit/onnx-cpp-benchmark
-cd onnx-cpp-benchmark
-mkdir build
-cd build
-cmake -GNinja -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library ..
-ninja
-~~~
-
-## Usage
-
-Download a simple `.onnx` file and run the benchmark on it.
+# Installation
 
 ```shell
-curl -L https://huggingface.co/ami-iit/mann/resolve/3a6fa8fe38d39deae540e4aca06063e9f2b53380/ergocubSN000_26j_49e.onnx -o ergocubSN000_26j_49e.onnx
-# Use default options
-onnx-cpp-benchmark ergocubSN000_26j_49e.onnx
-
-# Specify custom options
-onnx-cpp-benchmark ergocubSN000_26j_49e.onnx --iterations 100 --batch_size 5 --backend onnxruntimecpu
+./setup.sh
 ```
 
-Current supported backends:
-* `onnxruntimecpu`  : [ONNX Runtime](https://onnxruntime.ai/) with CPU
-* `onnxruntimecuda`  : [ONNX Runtime](https://onnxruntime.ai/) with CUDA
+# Usage
 
+Download a simple `.onnx` file:
 
-## Contributing
+```shell
+curl -sSLo yolov5n-face.onnx https://github.com/clibdev/yolov5-face/releases/latest/download/yolov5n-face.onnx
+```
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Build project:
 
-## License
+```shell
+rm -rf build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=deps
+cmake --build build -j$(nproc)
+```
 
-[BSD 3-Clause](https://choosealicense.com/licenses/bsd-3-clause/)
+Run the benchmark on CPU:
+
+```shell
+./build/onnx-cpp-benchmark yolov5n-face.onnx cpu
+```
+
+Run the benchmark on CUDA:
+
+```shell
+./build/onnx-cpp-benchmark yolov5n-face.onnx cuda
+```
